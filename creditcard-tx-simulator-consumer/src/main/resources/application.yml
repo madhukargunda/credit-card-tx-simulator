@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: creditcard-tx-simulator-consumer
+  kafka:
+    topic: credit-card-transactions
+    consumer:
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: '*'
+    streams:
+      bootstrap-servers: localhost:9092
+      application-id: credit-card-tx-app
+      replicationFactor: 1
+      commit-interval-ms: 2
+      stateDir: ./tmp/kstreams
+      cleanup:
+        on-startup: true
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: org.springframework.kafka.support.serializer.JsonSerde
+        # The number of threads to use for stream processing.
+        num.stream.threads: 1
+        commit.interval.ms: 1
+        spring.json.trusted.packages: '*'
+        # Whether to clean up the local state store on application start.
+    logging:
+      level:
+        org.apache.kafka.streams: DEBUG

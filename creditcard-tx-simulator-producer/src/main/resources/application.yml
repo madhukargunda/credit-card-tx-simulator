@@ -1,0 +1,26 @@
+server:
+  port: 8090
+
+spring:
+  application:
+   name: creditcard-tx-simulator-producer
+   randomUserUri: https://randomuser.me/api/
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      bootstrap-servers: localhost:9092
+      properties:
+        spring.json.add.type.headers: false
+    topic: credit-card-transactions
+
+  eventStore:
+    url: esdb://localhost:2113?tls=false
+    streamName: creditCard-tx-%s
+
+#logging:
+  #pattern:
+    #console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  #level:
+    #root: INFO
+    #io.madhu.creditCardTx.simulator: INFO

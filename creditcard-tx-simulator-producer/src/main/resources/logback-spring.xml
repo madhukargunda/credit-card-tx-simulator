@@ -1,0 +1,25 @@
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- Custom appender for your specific class -->
+    <appender name="PRETTY_PRINT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[[Walmart]] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root logger (default behavior for all classes) -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- Custom logger for your specific class -->
+    <logger name="io.madhu.creditCardTx.simulator.RegularTransactionSimulator" level="INFO" additivity="false">
+        <appender-ref ref="PRETTY_PRINT" />
+    </logger>
+
+</configuration>
