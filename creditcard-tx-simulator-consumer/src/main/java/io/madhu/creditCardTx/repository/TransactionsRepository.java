@@ -10,6 +10,7 @@ package io.madhu.creditCardTx.repository;
 
 import io.madhu.creditCardTx.constants.StateStoreTypes;
 import io.madhu.creditCardTx.domain.MerchantTransactionsData;
+import io.madhu.creditCardTx.repository.base.StateStoreRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.Topology;
@@ -28,9 +29,9 @@ public class TransactionsRepository {
     @Autowired
     private Topology topology;
 
-    public MerchantTransactionsData<String, Long> getCountByMerchant() {
+    public MerchantTransactionsData<String, Long> merchantTransactionSummary() {
         MerchantTransactionsData<String, Long> merchantTransactionsData = new MerchantTransactionsData<String, Long>();
-        ReadOnlyKeyValueStore<String, Long> store = stateStoreRepository.getStore(StateStoreTypes.GET_COUNT_BY_MERCHANT.name(),
+        ReadOnlyKeyValueStore<String, Long> store = stateStoreRepository.getStore(StateStoreTypes.MERCHANT_TRANSACTION_STORE.name(),
                 String.class, Long.class);
         KeyValueIterator<String, Long> all = store.all();
         while (all.hasNext()) {
@@ -43,7 +44,7 @@ public class TransactionsRepository {
 
     public MerchantTransactionsData<String, Double> getTotalSpendByUser() {
         MerchantTransactionsData<String, Double> merchantTransactionsData = new MerchantTransactionsData<String, Double>();
-        ReadOnlyKeyValueStore<String, Double> store = stateStoreRepository.getStore(StateStoreTypes.GET_TOTAL_BY_USER.name(),
+        ReadOnlyKeyValueStore<String, Double> store = stateStoreRepository.getStore(StateStoreTypes.USER_USAGE_SUMMARY_STORE.name(),
                 String.class, Double.class);
         KeyValueIterator<String, Double> all = store.all();
         while (all.hasNext()) {

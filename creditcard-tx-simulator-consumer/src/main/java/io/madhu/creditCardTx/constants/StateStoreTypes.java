@@ -6,6 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum StateStoreTypes {
-    GET_COUNT_BY_MERCHANT,
-    GET_TOTAL_BY_USER;
+    MERCHANT_TRANSACTION_STORE,
+    USER_USAGE_SUMMARY_STORE,
+    USER_CREDIT_STATUS_STORE,
+    FRAUD_DETECTION,
+    REGION_TRANSACTION_TOTAL,
+    REGION_TRANSACTION_SUMMARY_STORE;
 }

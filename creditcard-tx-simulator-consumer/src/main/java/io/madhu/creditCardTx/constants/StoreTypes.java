@@ -30,4 +30,8 @@ public enum StoreTypes {
                 .findFirst().get();
     }
 
+    public static String getStoreLocation(String storeName){
+        StoreTypes storeType = getStoreTypeByStoreName(storeName);
+        return storeType.getLocation().split(",")[1].trim();
+    }
 }

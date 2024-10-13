@@ -13,17 +13,20 @@ import io.madhu.creditCardTx.constants.MerchantType;
 import io.madhu.creditCardTx.constants.StoreTypes;
 import io.madhu.creditCardTx.constants.TransactionType;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
+
 @NoArgsConstructor
+@Data
 public class CreditCardTransaction implements Serializable {
 
-    private String creditCardNumber;
+    private String cardNumber;
     private String cardHolderName;
     private String creditCardType;
     private String cardExpiryDate;
@@ -33,12 +36,11 @@ public class CreditCardTransaction implements Serializable {
     private String userName;
 
     private String transactionId;
-    private MerchantType merchantType;
-    private BigDecimal transactionAmount;
-
     private StoreTypes storeType;
+    private MerchantType merchantType;
     private TransactionType transactionType;
     private LocalDateTime transactionTime;
+    private BigDecimal transactionAmount;
 
     private String transactionLocation;
     private String productName;
@@ -49,7 +51,7 @@ public class CreditCardTransaction implements Serializable {
     public String toString() {
         return "CreditCardTransaction{" +
                 "transactionId='" + transactionId + '\'' +
-                ", creditCardNumber='" + creditCardNumber + '\'' +
+                ", creditCardNumber='" +  + '\'' +
                 ", cardHolderName='" + cardHolderName + '\'' +
                 ", creditCardType='" + creditCardType + '\'' +
                 ", cardExpiryDate='" + cardExpiryDate + '\'' +

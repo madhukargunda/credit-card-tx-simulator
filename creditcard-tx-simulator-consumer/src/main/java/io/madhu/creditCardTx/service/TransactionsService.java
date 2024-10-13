@@ -26,8 +26,8 @@ public class TransactionsService {
     @Autowired
     TransactionMapper transactionMapper;
 
-    public MerchantTransactionsResponse getByMerchantCount() {
-        MerchantTransactionsData<String, Long> countByMerchant = transactionsRepository.getCountByMerchant();
+    public MerchantTransactionsResponse merchantTransactionSummary() {
+        MerchantTransactionsData<String, Long> countByMerchant = transactionsRepository.merchantTransactionSummary();
         return transactionMapper.from(countByMerchant, String.class, Long.class);
     }
 
