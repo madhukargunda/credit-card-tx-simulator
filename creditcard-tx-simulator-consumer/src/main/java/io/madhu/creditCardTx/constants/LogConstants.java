@@ -10,5 +10,7 @@ package io.madhu.creditCardTx.constants;
 
 public interface LogConstants {
 
-    public static final String PRINT_TX_LOG = "Walmart %s , CardHolder: %s, User: %s ,TransactionID: %s, Amount: %s";
+    //public static final String PRINT_TX_LOG = "Walmart %s , CardHolder: %s, User: %s ,TransactionID: %s, Amount: %s";
+
+    public static final String PRINT_TX_LOG = "Walmart [%s] , CardHolder: [%s], VisaType: [%s] User: [%s] ,TransactionID: [%s], Amount: [%s]";
 }

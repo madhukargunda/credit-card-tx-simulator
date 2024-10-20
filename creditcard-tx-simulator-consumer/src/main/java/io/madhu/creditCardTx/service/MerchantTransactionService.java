@@ -8,29 +8,58 @@
 
 package io.madhu.creditCardTx.service;
 
-import io.madhu.creditCardTx.domain.MerchantTransactionsData;
-import io.madhu.creditCardTx.dto.MerchantTransactionsResponse;
-import io.madhu.creditCardTx.dto.mapper.TransactionMapper;
-import io.madhu.creditCardTx.repository.TransactionsRepository;
+import io.madhu.creditCardTx.dto.store.Stall;
+import io.madhu.creditCardTx.dto.store.Store;
+import io.madhu.creditCardTx.exception.ResourceNotFoundException;
+import io.madhu.creditCardTx.mapper.TransactionMapper;
+import io.madhu.creditCardTx.repository.MerchantTransactionsRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
+@Slf4j
 public class MerchantTransactionService {
 
     @Autowired
-    TransactionsRepository transactionsRepository;
+    MerchantTransactionsRepository merchantTransactionsRepository;
+
+    @Autowired
+    StoreTransactionService storeTransactionService;
 
     @Autowired
     TransactionMapper transactionMapper;
 
-    public MerchantTransactionsResponse merchantTransactionSummary() {
-        MerchantTransactionsData<String, Long> countByMerchant = transactionsRepository.merchantTransactionSummary();
-        return transactionMapper.from(countByMerchant, String.class, Long.class);
+    public List<Stall> getAllMerchantSummaries() {
+        Map<String, Stall> aggregateAllStallsTransactions = new HashMap<>();
+        List<Store> allStoreSummaries = storeTransactionService.getAllStoreSummaries();
+        Map<String, List<Stall>> stallGroups = allStoreSummaries
+                .stream()
+                .flatMap(store -> store.getStalls().stream())
+                .collect(Collectors.groupingBy(stall -> stall.getStallName()));
+
+        stallGroups.entrySet().forEach(entry -> {
+            double totalAmount = 0;
+            int transcationCount = 0;
+            for (Stall stall : entry.getValue()) {
+                totalAmount += stall.getTotalTransactionAmount();
+                transcationCount += stall.getTransactionCount();
+            }
+            aggregateAllStallsTransactions.put(entry.getKey(), new Stall(entry.getKey(), transcationCount, totalAmount));
+        });
+        return aggregateAllStallsTransactions.entrySet().stream().map(entry -> entry.getValue()).collect(Collectors.toList());
     }
 
-    public MerchantTransactionsResponse getTotalSpendingByUser() {
-        MerchantTransactionsData<String, Double> totalSpendByUser = transactionsRepository.getTotalSpendByUser();
-        return transactionMapper.from(totalSpendByUser, String.class, Double.class);
+    public Stall getMerchantSummary(String merchantName) {
+        return this.getAllMerchantSummaries().stream()
+                .filter(stall -> stall.getStallName().equalsIgnoreCase(merchantName))
+                .findAny()
+                .orElseThrow(() -> new ResourceNotFoundException(merchantName + "Not Exist"));
+        // return merchantTransactionsRepository.getMerchantSummary(merchantName);
     }
 }

@@ -8,29 +8,35 @@
 
 package io.madhu.creditCardTx.service;
 
-import io.madhu.creditCardTx.domain.UserCreditCardUsageInfo;
-import io.madhu.creditCardTx.domain.UserCreditLimitSummary;
-import io.madhu.creditCardTx.domain.UserCreditCardUsageSummary;
-import io.madhu.creditCardTx.dto.mapper.TransactionMapper;
+import io.madhu.creditCardTx.domain.user.UserFinancialSummary;
+import io.madhu.creditCardTx.mapper.TransactionMapper;
 import io.madhu.creditCardTx.repository.UserTransactionRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 
 @Service
+@Slf4j
 public class UserTransactionService {
 
     @Autowired
     private UserTransactionRepository userTransactionRepository;
 
     @Autowired
+    private Sinks.Many<UserFinancialSummary> userFinancialSummaryMany;
+
+    @Autowired
     private TransactionMapper transactionMapper;
 
-    public UserCreditCardUsageInfo userTotalSpending(String userId){
-        return transactionMapper.from(userTransactionRepository.userCreditCardUsageSummary(userId));
+    public Flux<UserFinancialSummary> getUserFinancialSummary(String username) {
+        log.info("Fetching financial summary for user: {}", username);
+        return Flux.just(userTransactionRepository.getUserFinancialSummary(username));
     }
 
-    public UserCreditLimitSummary creditLimitSummary(String userId){
-        return userTransactionRepository.creditLimitSummary(userId);
+    public Flux<UserFinancialSummary> getAllUserFinancialSummary() {
+        log.info("Fetching financial summary for All users");
+        return userFinancialSummaryMany.asFlux();
     }
-
 }

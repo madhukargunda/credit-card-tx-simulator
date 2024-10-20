@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Credit Card Transactions Dashboard </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+
+
+        tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(odd) td {
+            background-color: #f2f2f2;
+        }
+
+
+        .highlight-update {
+            background-color: #d1ffd1 !important; /* Light green highlight */
+            transition: background-color 1s ease; /* Smooth transition */
+        }
+
+        .alert {
+            font-weight: bold;
+        }
+
+        .alert-yes {
+            color: red;
+        }
+
+        .alert-no {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <h1>Real-Time Credit Card Transactions Dashboard </h1>
+    <table id="user-transactions">
+        <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Email</th>
+            <th>Total Spending</th>
+            <th>Transaction Count</th>
+            <th>Credit Limit</th>
+            <th>Current Spending</th>
+            <th>Alerts</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const eventSource = new EventSource('/credit-tx-simulator/api/v1/users/financial-summary');
+
+    eventSource.onmessage = function(event) {
+        const transaction = JSON.parse(event.data);
+        const userId = transaction.userId;
+
+        // Check if the user row exists; if not, create one
+        if (!$(`#user-${userId}`).length) {
+            $("#user-transactions tbody").append(`
+                <tr id="user-${userId}">
+                    <td>${userId}</td>
+                    <td id="email-${userId}">Loading...</td>
+                    <td>$<span id="spending-${userId}">0.00</span></td>
+                    <td><span id="transactionCount-${userId}">0</span></td>
+                    <td>$<span id="creditLimit-${userId}">0.00</span></td>
+                    <td>$<span id="currentSpending-${userId}">0.00</span></td>
+                    <td id="alert-${userId}">None</td>
+                </tr>
+            `);
+        }
+
+        // Update the user’s transaction data
+        $(`#email-${userId}`).text(transaction.userEmail);
+        $(`#spending-${userId}`).text(transaction.totalSpending.toFixed(2));
+        $(`#transactionCount-${userId}`).text(transaction.transactionCount);
+        $(`#creditLimit-${userId}`).text(transaction.creditLimit.toFixed(2));
+        $(`#currentSpending-${userId}`).text(transaction.totalSpending.toFixed(2));
+        $(`#alert-${userId}`).text(transaction.alertMessage || 'No alerts');
+
+        // Highlight the row briefly to indicate update
+        const row = $(`#user-${userId}`);
+        row.addClass('highlight-update');
+        setTimeout(() => row.removeClass('highlight-update'), 2000);
+    };
+
+    eventSource.onerror = function(error) {
+        console.error("Error receiving transaction updates:", error);
+    };
+</script>
+
+</body>
+</html>

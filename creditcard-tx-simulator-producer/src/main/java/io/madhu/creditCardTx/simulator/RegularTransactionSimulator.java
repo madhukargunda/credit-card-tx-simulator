@@ -28,7 +28,7 @@ public class RegularTransactionSimulator implements Runnable {
 
     private final RandomUserService randomUserService;
 
-    private static final String PRINT_TX_LOG = "Walmart [%s] , CardHolder: [%s], VisaType: [%s] User: [%s] ,TransactionID: [%s], Amount: [%s]";
+    private static final String PRINT_TX_LOG = "Walmart [%s] , CardHolder: [%s], VisaType: [%s] User: [%s] ,UserEmail:[%s],TransactionID: [%s], Amount: [%s]";
 
     @Override
     public void run() {
@@ -36,8 +36,8 @@ public class RegularTransactionSimulator implements Runnable {
             try {
                 User user = randomUserService.getRandomUser();
                 CreditCardTransaction cardTransaction = transactionGenerator.generateTransaction(user);
-                log.info(String.format(PRINT_TX_LOG, Thread.currentThread().getName(),cardTransaction.getCreditCardNumber(),cardTransaction.getCreditCardType(),cardTransaction.getUserName(),
-                        cardTransaction.getTransactionId(), cardTransaction.getTransactionAmount()));
+                log.info(String.format(PRINT_TX_LOG, Thread.currentThread().getName(), cardTransaction.getCreditCardNumber(), cardTransaction.getCreditCardType(), cardTransaction.getUserName(),
+                        cardTransaction.getUserEmail(), cardTransaction.getTransactionId(), cardTransaction.getTransactionAmount()));
                 TimeUnit.SECONDS.sleep(60);
                 kafkaEventDispatcher.dispatch(cardTransaction.getTransactionId(), cardTransaction);
             } catch (InterruptedException e) {
