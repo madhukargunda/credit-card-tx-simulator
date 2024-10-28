@@ -1,4 +1,14 @@
+server:
+  servlet:
+    context-path: /credit-tx-simulator
+
 spring:
+  jackson:
+    default-property-inclusion: non_null
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
   application:
     name: creditcard-tx-simulator-consumer
   kafka:
@@ -32,3 +42,20 @@ spring:
     logging:
       level:
         org.apache.kafka.streams: DEBUG
+
+
+springdoc:
+  api-docs:
+    groups:
+      enabled: true
+  swagger-ui:
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+#Spring boot actuatore endpoints configuration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'health, kafkastreams'

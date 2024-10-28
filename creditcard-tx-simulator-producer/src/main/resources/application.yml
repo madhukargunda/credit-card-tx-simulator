@@ -18,6 +18,9 @@ spring:
     url: esdb://localhost:2113?tls=false
     streamName: creditCard-tx-%s
 
+#spring boot actuator endpoints configuration
+
+
 #logging:
   #pattern:
     #console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

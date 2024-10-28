@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Walmart Store Transactions Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #007bff;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        #storeCharts {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+            max-width: 1600px;
+            width: 100%;
+        }
+
+        .store-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .store-heading {
+            font-size: 1.4rem;
+            color: #555;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 400px !important;
+        }
+    </style>
+</head>
+<body>
+<h1>Walmart Store Transactions Dashboard</h1>
+<div id="storeCharts"></div>
+
+<script>
+    const eventSource = new EventSource('/credit-tx-simulator/api/v1/transactions/stores/summary');
+
+    // Define an array of colors to be used for each store
+    const colors = [
+        "rgba(75, 192, 192, 0.6)",
+        "rgba(255, 99, 132, 0.6)",
+        "rgba(54, 162, 235, 0.6)",
+        "rgba(255, 206, 86, 0.6)",
+        "rgba(153, 102, 255, 0.6)",
+        "rgba(255, 159, 64, 0.6)"
+    ];
+    const borderColors = [
+        "rgba(75, 192, 192, 1)",
+        "rgba(255, 99, 132, 1)",
+        "rgba(54, 162, 235, 1)",
+        "rgba(255, 206, 86, 1)",
+        "rgba(153, 102, 255, 1)",
+        "rgba(255, 159, 64, 1)"
+    ];
+
+    eventSource.onmessage = function(event) {
+        const stores = JSON.parse(event.data);
+        const container = document.getElementById("storeCharts");
+        container.innerHTML = ""; // Clear previous charts
+
+        stores.forEach((store, index) => {
+            // Select color for the current store by cycling through the colors array
+            const colorIndex = index % colors.length;
+            const backgroundColor = colors[colorIndex];
+            const borderColor = borderColors[colorIndex];
+
+            // Create a container for each store's chart
+            const storeContainer = document.createElement("div");
+            storeContainer.className = "store-container";
+
+            // Create a heading for the store name
+            const storeHeading = document.createElement("h2");
+            storeHeading.className = "store-heading";
+            storeHeading.textContent = `Store: ${store.storeName}`;
+            storeContainer.appendChild(storeHeading);
+
+            // Create a canvas element for each store chart
+            const canvas = document.createElement("canvas");
+            canvas.id = `storeChart${index}`;
+            storeContainer.appendChild(canvas);
+
+            container.appendChild(storeContainer);
+
+            // Prepare data for the chart
+            const stallNames = store.stalls.map(stall => stall.stallName);
+            const transactionAmounts = store.stalls.map(stall => stall.totalTransactionAmount);
+            const transactionCounts = store.stalls.map(stall => stall.transactionCount);
+
+            // Create the chart
+            new Chart(canvas, {
+                type: "bar",
+                data: {
+                    labels: stallNames,
+                    datasets: [{
+                        label: `Transaction Amounts`,
+                        data: transactionAmounts,
+                        backgroundColor: backgroundColor,
+                        borderColor: borderColor,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#555',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: (value, context) => {
+                                // Return only the transaction count number
+                                const index = context.dataIndex;
+                                return transactionCounts[index];
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        });
+    };
+
+    eventSource.onerror = function() {
+        console.error("Error connecting to EventSource. Retrying...");
+    };
+</script>
+</body>
+</html>

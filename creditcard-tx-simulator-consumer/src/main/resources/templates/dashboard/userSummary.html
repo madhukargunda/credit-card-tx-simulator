@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Financial Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        .dashboard-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .dashboard-card {
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.5s ease; /* Smooth transition for background color change */
+        }
+
+        .account-summary {
+            background-color: #f9f9e6; /* Light yellow */
+        }
+
+        .spending-details {
+            background-color: #e6f9f9; /* Light cyan */
+        }
+
+        .credit-limit-info {
+            background-color: #f6e6f9; /* Light lavender */
+        }
+
+        .alerts {
+            background-color: #f9e6e6; /* Light coral */
+        }
+
+        /* Alert styles */
+        .alert-yes {
+            color: green;
+            font-weight: bold;
+        }
+
+        .alert-no {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <h1>User Financial Dashboard</h1>
+
+    <div class="dashboard-card account-summary">
+        <h2>Account Summary</h2>
+        <p><strong>User ID:</strong> <span id="userId">Loading...</span></p>
+        <p><strong>User Email:</strong> <span id="userEmail">Loading...</span></p>
+    </div>
+
+    <div class="dashboard-card spending-details">
+        <h2>Spending Details</h2>
+        <p><strong>Total Spending:</strong> $<span id="totalSpending">0.00</span></p>
+        <p><strong>Transaction Count:</strong> <span id="transactionCount">0</span></p>
+    </div>
+
+    <div class="dashboard-card credit-limit-info">
+        <h2>Credit Limit Information</h2>
+        <p><strong>Credit Limit:</strong> $<span id="creditLimit">0.00</span></p>
+        <p><strong>Current Spending:</strong> $<span id="currentSpending">0.00</span></p>
+        <p><strong>Credit Utilization:</strong> <span id="creditUtilization">0%</span></p>
+    </div>
+
+    <div class="dashboard-card alerts">
+        <h2>Alerts</h2>
+        <p><strong>Limit Approaching:</strong> <span id="limitApproaching" class="alert-no">No</span></p>
+        <p><strong>Limit Exceeded:</strong> <span id="limitExceeded" class="alert-no">No</span></p>
+        <p><strong>Alert Message:</strong> <span id="alertMessage" class="alert-INFO">No alerts</span></p>
+        <p><strong>Alert Type:</strong> <span id="alertMessageType" class="alert-INFO">INFO</span></p>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+        userId = /*[[${userId}]]*/ ''; // Dynamically populated userId from Thymeleaf
+
+        const url = '/credit-tx-simulator/api/v1/users/${userId}/financial-summary';
+        const eventSource = new EventSource('/credit-tx-simulator/api/v1/users/' + userId + '/financial-summary');
+
+        eventSource.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+
+            // Update dashboard values
+            $("#userId").text(data.userId);
+            $("#userEmail").text(data.userEmail);
+            $("#totalSpending").text(data.totalSpending.toFixed(2));
+            $("#transactionCount").text(data.transactionCount);
+            $("#creditLimit").text(data.creditLimit.toFixed(2));
+            $("#currentSpending").text(data.totalSpending.toFixed(2));
+
+            const creditUtilization = (data.totalSpending / data.creditLimit) * 100;
+            $("#creditUtilization").text(creditUtilization.toFixed(1) + "%");
+
+            $("#limitApproaching").removeClass("alert-no alert-yes")
+                                 .addClass(data.limitApproaching ? "alert-yes" : "alert-no")
+                                 .text(data.limitApproaching ? "Yes" : "No");
+
+            $("#limitExceeded").removeClass("alert-no alert-yes")
+                               .addClass(data.limitExceeded ? "alert-yes" : "alert-no")
+                               .text(data.limitExceeded ? "Yes" : "No");
+
+            $("#alertMessage").text(data.alertMessage)
+                              .attr("class", `alert-${data.alertMessageType}`);
+            $("#alertMessageType").text(data.alertMessageType)
+                                  .attr("class", `alert-${data.alertMessageType}`);
+
+            // Change background color for each section when data is updated
+            $('.dashboard-card').each(function() {
+                $(this).css('background-color', getRandomLightColor());
+            });
+        };
+
+        eventSource.onerror = function (error) {
+            console.error("Error fetching real-time updates:", error);
+        };
+
+        // Function to generate a random light color
+        function getRandomLightColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgba(${r}, ${g}, ${b}, 0.5)`; // Set opacity for lightness
+        }
+    /*]]>*/
+</script>
+
+</body>
+</html>

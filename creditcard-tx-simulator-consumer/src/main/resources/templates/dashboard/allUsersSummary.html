@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Credit Card Transactions Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        .user-card {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f9f9f9;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-card h2 {
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .alert {
+            font-weight: bold;
+        }
+
+        .alert-yes {
+            color: red;
+        }
+
+        .alert-no {
+            color: green;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <h1>Real-Time Credit Card Transactions Dashboard</h1>
+    <div id="user-transactions"></div>
+</div>
+
+<script>
+    const eventSource = new EventSource('/credit-tx-simulator/api/v1/users/financial-summary');
+
+    eventSource.onmessage = function(event) {
+        const transaction = JSON.parse(event.data);
+        const userId = transaction.userId;
+
+        // Check if the user's section exists; if not, create one
+        if (!$(`#user-${userId}`).length) {
+            $("#user-transactions").append(`
+                <div class="user-card" id="user-${userId}">
+                    <h2>User: ${userId}</h2>
+                    <table>
+                        <tr>
+                            <th>Email:</th>
+                            <td id="email-${userId}">Loading...</td>
+                        </tr>
+                        <tr>
+                            <th>Total Spending:</th>
+                            <td>$<span id="spending-${userId}">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <th>Transaction Count:</th>
+                            <td><span id="transactionCount-${userId}">0</span></td>
+                        </tr>
+                        <tr>
+                            <th>Credit Limit:</th>
+                            <td>$<span id="creditLimit-${userId}">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <th>Current Spending:</th>
+                            <td>$<span id="currentSpending-${userId}">0.00</span></td>
+                        </tr>
+                        <tr>
+                            <th>Alerts:</th>
+                            <td id="alert-${userId}">None</td>
+                        </tr>
+                    </table>
+                </div>
+            `);
+        }
+
+        // Update the user’s transaction data
+        $(`#email-${userId}`).text(transaction.userEmail);
+        $(`#spending-${userId}`).text(transaction.totalSpending.toFixed(2));
+        $(`#transactionCount-${userId}`).text(transaction.transactionCount);
+        $(`#creditLimit-${userId}`).text(transaction.creditLimit.toFixed(2));
+        $(`#currentSpending-${userId}`).text(transaction.totalSpending.toFixed(2));
+        $(`#alert-${userId}`).text(transaction.alertMessage || 'No alerts');
+    };
+
+    eventSource.onerror = function(error) {
+        console.error("Error receiving transaction updates:", error);
+    };
+</script>
+
+</body>
+</html>
