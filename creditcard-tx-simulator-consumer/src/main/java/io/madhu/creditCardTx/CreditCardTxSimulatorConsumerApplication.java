@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CreditcardTxSimulatorConsumerApplication {
+public class CreditCardTxSimulatorConsumerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CreditcardTxSimulatorConsumerApplication.class, args);
+        SpringApplication.run(CreditCardTxSimulatorConsumerApplication.class, args);
     }
 }

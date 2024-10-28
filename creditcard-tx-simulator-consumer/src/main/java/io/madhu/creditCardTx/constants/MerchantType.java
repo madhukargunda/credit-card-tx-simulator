@@ -37,14 +37,23 @@ public enum MerchantType {
     CLINICS(18),
     FRAUDULENT_MERCHANT(420);
 
-    private final Integer id;
+    private final Integer code;
 
-    public static Optional<MerchantType> findById(Integer i) {
+    public static Optional<MerchantType> fromCode(Integer code) {
         for (MerchantType merchantType : MerchantType.values()) {
-            if (merchantType.getId().equals(i)) {
+            if (merchantType.getCode().equals(code)) {
                 return Optional.of(merchantType);
             }
         }
-        return Optional.ofNullable(null);
+        return Optional.empty();
+    }
+
+    public static Optional<MerchantType> fromName(String name) {
+        for (MerchantType merchantType : MerchantType.values()) {
+            if (merchantType.name().equals(name)) {
+                return Optional.of(merchantType);
+            }
+        }
+        return Optional.empty();
     }
 }

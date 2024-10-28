@@ -6,7 +6,7 @@
  * Project: creditcard-tx-simulator-consumer
  */
 
-package io.madhu.creditCardTx.repository;
+package io.madhu.creditCardTx.repository.base;
 
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StoreQueryParameters;
@@ -36,7 +36,8 @@ public class StateStoreRepository {
      */
     public <K, V> ReadOnlyKeyValueStore<K, V> getStore(String storeName, Class<K> keyType, Class<V> valueType) {
         KafkaStreams kafkaStreams = streamsBuilderFactoryBean.getKafkaStreams();
-        if (Objects.nonNull(kafkaStreams) && kafkaStreams.state() == KafkaStreams.State.RUNNING) {
+        if (Objects.nonNull(kafkaStreams)
+                && kafkaStreams.state() == KafkaStreams.State.RUNNING) {
             return kafkaStreams.store(StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.<K, V>keyValueStore()));
         } else
             throw new IllegalStateException("Store is not ready to access, Please wait for some time");
@@ -57,6 +58,5 @@ public class StateStoreRepository {
         ReadOnlyKeyValueStore<K, V> store = getStore(storeName, keyType, valueType);
         return store.get(key);
     }
-
 
 }

@@ -9,6 +9,9 @@ spring:
           json:
             trusted:
               packages: '*'
+    producer:
+      properties:
+        spring.json.add.type.headers: false
     streams:
       bootstrap-servers: localhost:9092
       application-id: credit-card-tx-app
@@ -24,6 +27,7 @@ spring:
         num.stream.threads: 1
         commit.interval.ms: 1
         spring.json.trusted.packages: '*'
+        spring.json.add.type.headers: false
         # Whether to clean up the local state store on application start.
     logging:
       level:

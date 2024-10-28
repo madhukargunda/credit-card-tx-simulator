@@ -38,7 +38,7 @@ public class RegularTransactionSimulator implements Runnable {
                 CreditCardTransaction cardTransaction = transactionGenerator.generateTransaction(user);
                 log.info(String.format(PRINT_TX_LOG, Thread.currentThread().getName(),cardTransaction.getCreditCardNumber(),cardTransaction.getCreditCardType(),cardTransaction.getUserName(),
                         cardTransaction.getTransactionId(), cardTransaction.getTransactionAmount()));
-                TimeUnit.SECONDS.sleep(120);
+                TimeUnit.SECONDS.sleep(60);
                 kafkaEventDispatcher.dispatch(cardTransaction.getTransactionId(), cardTransaction);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

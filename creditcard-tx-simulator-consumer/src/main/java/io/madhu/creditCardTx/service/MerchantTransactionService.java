@@ -1,8 +1,8 @@
 /**
  * Author: Madhu
  * User:madhu
- * Date:2/10/24
- * Time:10:47 PM
+ * Date:13/10/24
+ * Time:1:57 PM
  * Project: creditcard-tx-simulator-consumer
  */
 
@@ -12,13 +12,11 @@ import io.madhu.creditCardTx.domain.MerchantTransactionsData;
 import io.madhu.creditCardTx.dto.MerchantTransactionsResponse;
 import io.madhu.creditCardTx.dto.mapper.TransactionMapper;
 import io.madhu.creditCardTx.repository.TransactionsRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
-public class TransactionsService {
+public class MerchantTransactionService {
 
     @Autowired
     TransactionsRepository transactionsRepository;
